@@ -1,0 +1,384 @@
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(bookmark-save-flag 1)
+ '(c-default-style (quote ((c-mode . "stroustrup") (c++-mode . "stroustrup") (java-mode . "java") (awk-mode . "awk") (other . "gnu"))))
+ '(column-number-mode t)
+ '(fill-column 80)
+ '(ido-mode (quote both) nil (ido))
+ '(inhibit-startup-screen t)
+ '(ispell-program-name "aspell")
+ '(mouse-yank-at-point t)
+ '(scroll-conservatively 10000)
+ '(show-paren-mode t)
+ '(speedbar-visiting-tag-hook (quote (speedbar-highlight-one-tag-line reposition-window)))
+ '(tool-bar-mode nil))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ )
+
+;; ================================================================
+(defun my-cpp-mode-hook()
+  (setq tab-width 4 indent-tabs-mode nil)
+  (which-function-mode 1)
+  )
+(add-hook 'c-mode-hook 'my-cpp-mode-hook)
+(add-hook 'c++-mode-hook 'my-cpp-mode-hook)
+(add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.inl$" . c++-mode))
+;; ================================================================
+(setq w32-charset-info-alist
+    (cons '("gbk" w32-charset-gb2312 . 936) w32-charset-info-alist))
+
+(setq default-frame-alist
+      (append
+       '((font . "fontset-gbk")) default-frame-alist))
+
+(create-fontset-from-fontset-spec
+ (concat
+  "-outline-Courier New-normal-r-normal-normal-14-*-*-*-c-*-fontset-gbk,"
+  "chinese-gb2312:-outline-新宋体-normal-r-normal-14-*-*-*-*-c-*-iso10646-1,"
+  "mule-unicode-0100-24ff:-*-新宋体-normal-r-normal-14-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-5:-*-新宋体-normal-r-normal-14-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-6:-*-新宋体-normal-r-normal-14-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-7:-*-新宋体-normal-r-normal-14-*-*-*-*-c-*-iso10646-1"))
+
+(set-default-font "fontset-gbk")
+;; ================================================================
+
+;; server
+(server-start)
+
+;; color theme
+;(require 'color-theme)
+;(color-theme-initialize)
+;(color-theme-ryan)
+
+;; To save the buffer opened, M-x desktop-save.
+;; To clear the saved records, M-x desktop-clear.
+(desktop-save-mode t)
+;; Customization follows below
+(setq history-length 250)
+(add-to-list 'desktop-globals-to-save 'file-name-history)
+
+;; occur
+(global-set-key (kbd "C-c o") 'occur)
+
+;; igrep
+; (autoload 'igrep "igrep"
+;   "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+; (autoload 'igrep-find "igrep"
+;   "*Run `grep` via `find`..." t)
+; (autoload 'igrep-visited-files "igrep"
+;   "*Run `grep` ... on all visited files." t)
+; (autoload 'dired-do-igrep "igrep"
+;   "*Run `grep` on the marked (or next prefix ARG) files." t)
+; (autoload 'dired-do-igrep-find "igrep"
+;   "*Run `grep` via `find` on the marked (or next prefix ARG) directories." t)
+; (autoload 'Buffer-menu-igrep "igrep"
+;   "*Run `grep` on the files visited in buffers marked with '>'." t)
+; (autoload 'igrep-insinuate "igrep"
+;   "Define `grep' aliases for the corresponding `igrep' commands." t)
+; (autoload 'grep "igrep"
+;   "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+; (autoload 'egrep "igrep"
+;   "*Run `egrep`..." t)
+; (autoload 'fgrep "igrep"
+;   "*Run `fgrep`..." t)
+; (autoload 'agrep "igrep"
+;   "*Run `agrep`..." t)
+; (autoload 'grep-find "igrep"
+;   "*Run `grep` via `find`..." t)
+; (autoload 'egrep-find "igrep"
+;   "*Run `egrep` via `find`..." t)
+; (autoload 'fgrep-find "igrep"
+;   "*Run `fgrep` via `find`..." t)
+; (autoload 'agrep-find "igrep"
+;   "*Run `agrep` via `find`..." t)
+; 
+;; display line number
+(require 'linum)
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; browse-kill-ring.el
+;(require 'browse-kill-ring)
+;(global-set-key [(control c)(k)] 'browse-kill-ring)
+;(browse-kill-ring-default-keybindings)
+
+;; hippie-expand to replace the default M-/(dabbrev-expand)
+(global-set-key [(meta ?/)] 'hippie-expand)
+;(setq hippie-expand-try-functions-list 
+;      '(try-expand-dabbrev
+;	try-expand-dabbrev-visible
+;	try-expand-dabbrev-all-buffers
+;	try-expand-dabbrev-from-kill
+;	try-complete-file-name-partially
+;	try-complete-file-name
+;	try-expand-all-abbrevs
+;	try-expand-list
+;	try-expand-line
+;	try-complete-lisp-symbol-partially
+;	try-complete-lisp-symbol))
+;;--------------------------------
+
+;; temporary mark
+;; C-. to make a temporary mark,
+;; C-, to move between the current point and the temporary mark.
+(global-set-key [(control ?\.)] 'ska-point-to-register)
+(global-set-key [(control ?\,)] 'ska-jump-to-register)
+(defun ska-point-to-register()
+  "Store cursorposition _fast_ in a register. 
+Use ska-jump-to-register to jump back to the stored 
+position."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (point-to-register 8))
+
+(defun ska-jump-to-register()
+  "Switches between current cursorposition and position
+that was stored with ska-point-to-register."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (let ((tmp (point-marker)))
+        (jump-to-register 8)
+        (set-register 8 tmp)))
+;;--------------------------------
+
+;;--------------------------------
+;; goto-char
+;; C-c a #a_char to goto a_char
+(defun wy-go-to-char (n char)
+  "Move forward to Nth occurence of CHAR.
+Typing `wy-go-to-char-key' again will move forwad to the next Nth
+occurence of CHAR."
+  (interactive "p\ncGo to char: ")
+  (search-forward (string char) nil nil n)
+  (while (char-equal (read-char)
+		     char)
+    (search-forward (string char) nil nil n))
+  (setq unread-command-events (list last-input-event)))
+
+(define-key global-map (kbd "C-c a") 'wy-go-to-char)
+;;--------------------------------
+
+;;--------------------------------
+;; easy copying
+
+(defun copy-line (&optional arg)
+  "Save current line into Kill-Ring without mark the line"
+  (interactive "P")
+  (let ((beg (line-beginning-position))
+	(end (line-end-position arg)))
+    (copy-region-as-kill beg end)))
+
+(defun copy-word (&optional arg)
+  "Copy words at point"
+  (interactive "P")
+  (let ((beg (progn (if (looking-back "[a-zA-Z0-9]" 1) (backward-word 1)) (point)))
+	(end (progn (forward-word arg) (point))))
+    (copy-region-as-kill beg end)))
+
+(defun copy-paragraph (&optional arg)
+  "Copy paragraphs at point"
+  (interactive "P")
+  (let ((beg (progn (backward-paragraph 1) (point)))
+	(end (progn (forward-paragraph arg) (point))))
+    (copy-region-as-kill beg end)))
+;;--------------------------------
+
+;;hide region
+;(require 'hide-region)
+;(global-set-key (kbd "C-c r") 'hide-region-hide)
+;(global-set-key (kbd "C-c R") 'hide-region-unhide)
+
+;; hide lines
+;(require 'hide-lines)
+;(global-set-key (kbd "C-c l") 'hide-lines)
+;(global-set-key (kbd "C-c L") 'show-all-invisible)
+
+;;--------------------------------
+;; folding
+;;--------------------------------
+;(load-library  "folding")
+;(declare (special fold-fold-on-startup
+;		  fold-keys-already-setup
+;		  ))
+    
+;(setq fold-fold-on-startup t)
+;(folding-mode-add-find-file-hook)
+
+;(setq fold-keys-already-setup nil)
+;(add-hook 'folding-mode-hook
+;	  (function (lambda()
+;		      (unless fold-keys-already-setup
+;			(setq fold-keys-already-setup t)
+;			(define-prefix-command 'ctl-f-folding-mode-prefix)
+;			(define-key 'ctl-f-folding-mode-prefix "f" 'fold-fold-region)
+;			(define-key  'ctl-f-folding-mode-prefix "e" 'fold-enter)
+;			(define-key 'ctl-f-folding-mode-prefix "x" 'fold-exit)
+;			(define-key  'ctl-f-folding-mode-prefix "b" 'fold-whole-buffer)
+;			(define-key 'ctl-f-folding-mode-prefix "o" 'fold-open-buffer)
+;			(define-key 'ctl-f-folding-mode-prefix "h" 'fold-hide)
+;			(define-key 'ctl-f-folding-mode-prefix "s" 'fold-show)
+;			(define-key 'ctl-f-folding-mode-prefix "t" 'fold-top-level)
+;			(define-key 'ctl-f-folding-mode-prefix "f" 'fold-fold-region)
+;			)
+;		      (local-set-key "\C-f" 'ctl-f-folding-mode-prefix))))
+
+;(fold-add-to-marks-list 'sgml-mode
+;			"<!-- {" 
+; 			"<!-- } -->" " --> ")
+;(fold-add-to-marks-list 'c-mode "/* <" "/* > */" "*/")
+;(fold-add-to-marks-list 'c++-mode
+;			"//<" "//>" "")
+;(fold-add-to-marks-list 'LaTeX-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'latex2e-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'latex-mode "%%%% {{{" "%%%% }}}" " ")
+;(fold-add-to-marks-list 'BibTeX-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'lisp-mode ";;; {" ";;; }" "")
+;(fold-add-to-marks-list 'lex-mode" /* {{{ " " /* }}} */ " "*/")
+;(fold-add-to-marks-list 'html-mode "<!-- { " "<!-- } -->" "-->")
+;(fold-add-to-marks-list 'shell-script-mode "# {{{" "# }}}" nil)
+;(fold-add-to-marks-list 'sh-mode "# {{{ " "# }}}" nil)
+;;-END FOLDING--------------------------------
+
+;;--------------------------------
+;; dictionary
+;;--------------------------------
+;(load "dictionary-init")
+
+;; key bindings
+;(global-set-key "\C-cs" 'dictionary-search)
+;(global-set-key "\C-cm" 'dictionary-match-words)
+;(global-set-key [(control c)(d)] 'dictionary-lookup-definition)
+
+;; choose a dictionary server
+;(setq dictionary-server "localhost")
+
+;; for dictionary tooltip mode
+;; choose the dictionary: "wn" for WordNet
+;; "web1913" for Webster's Revised Unabridged Dictionary(1913)
+;; so on
+;(setq dictionary-tooltip-dictionary "wn")
+;; global dictionary-mode
+;(global-dictionary-tooltip-mode t)
+;; activate for all text-based modes
+;(add-hook 'text-mode-hook 'dictionary-tooltip-mode)
+;(dictionary-tooltip-mode t)
+
+;;--------------------------------
+
+(setq frame-title-format "emacs@%b")
+(setq user-full-name "Ryan Duan")
+(setq user-mail-address "duanpanda@gmail.com")
+
+;; customized key binding
+(global-set-key (kbd "<f9>") 'speedbar)
+(global-set-key (kbd "<f11>") 'calendar)
+(global-set-key (kbd "<f12>") 'list-bookmarks)
+(global-set-key (kbd "<C-f1>") 'tags-search)
+(global-set-key (kbd "<C-f2>") 'find-file-at-point)
+(global-set-key (kbd "<f5>") 'imenu)
+(global-set-key (kbd "<f7>") 'compile)
+
+;; time of sun-rise and sun-set. Type S key in calendar to see it.
+(setq calendar-latitude +39.54)
+(setq calendar-longitude +116.28)
+(setq calendar-location-name "北京")
+
+;; 设置阴历显示。在calendar上用pC显示阴历
+(setq chinese-calendar-celestial-stem
+  ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+(setq chinese-calendar-terrestrial-branch
+  ["子" "丑" "寅" "卯" "辰" "巳" "戊" "未" "申" "酉" "戌" "亥"])
+
+;; 设置 calendar 的显示
+(setq calendar-remove-frame-by-deleting t)
+(setq calendar-week-start-day 1)            ; 设置星期一为每周的第一天
+(setq mark-diary-entries-in-calendar t)     ; 标记calendar上有diary的日期
+(setq mark-holidays-in-calendar nil)        ; 为了突出有diary的日期，calendar上不标记节日
+(setq view-calendar-holidays-initially nil) ; 打开calendar的时候不显示一堆节日 
+
+;-----------
+;; Load CEDET
+;(load-file "D:/Program Files/emacs_load/cedet-1.0pre4/common/cedet.el")
+
+;; Enabling various SEMANTIC minor modes.  See semantic/INSTALL for more ideas.
+;; Select one of the following:
+
+;; * This enables the database and idle reparse engines
+;; (semantic-load-enable-minimum-features)
+
+;; * This enables some tools useful for coding, such as summary mode
+;;   imenu support, and the semantic navigator
+;;   It also includes (semantic-load-enable-minimum-features)
+;; (semantic-load-enable-code-helpers)
+
+;; * This enables even more coding tools such as the nascent intellisense mode
+;;   decoration mode, and stickyfunc mode (plus regular code helpers)
+;; (semantic-load-enable-guady-code-helpers)
+
+;; * This turns on which-func support (Plus all other code helpers)
+;; (semantic-load-enable-excessive-code-helpers)
+
+;; This turns on modes that aid in grammar writing and semantic tool
+;; development.  It does not enable any other features such as code
+;; helpers above.
+;; (semantic-load-enable-semantic-debugging-helpers)
+
+;(semantic-load-enable-code-helpers)
+
+;; Load semantic imenu (support both X and Win32)
+;(when (and (or (eq window-system 'x)
+;	       (eq window-system 'w32))
+;	   (locate-library "imenu"))
+;  (add-hook 'semantic-init-hooks (lambda ()
+;				   (condition-case nil
+;				       (imenu-add-to-menubar
+;					semantic-load-imenu-string)
+;				     (error nil)))))
+;(if (fboundp #'which-func-mode)
+;    (add-hook 'semantic-init-hooks (lambda ()
+;				     (which-func-mode 1))))
+
+;(setq semanticdb-default-save-directory "D:/tmp/semanticdbcache")
+;-----------
+
+;-----------
+;(add-to-list 'load-path
+;	     "D:/Program Files/emacs_load/ecb-2.32")
+;(require 'ecb)
+
+;; org-mode
+;-----------
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ce" 'org-agenda)
+
+;(require 'printing)
+;(pr-update-menus)
+
+;(require 'xcscope)
+
+;(load "clearcase")
+
+;; muse
+;;--------------------------------
+;(require 'muse-mode)
+;(require 'muse-publish)
+;(require 'muse-html)
+;;(require 'muse-latex)
+;;(require 'muse-texinfo)
+;;(require 'muse-docbook)
+;;(require 'muse-wiki nil t)
+;(require 'muse-project)
+
+; Set charset to UTF8
+;(setq muse-html-meta-content-type (concat "text/html; charset=utf-8"))
+;;--------------------------------

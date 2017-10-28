@@ -1,0 +1,129 @@
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(bookmark-save-flag 1)
+ '(c-default-style
+   (quote
+    ((c-mode . "stroustrup")
+     (c++-mode . "stroustrup")
+     (java-mode . "java")
+     (awk-mode . "awk")
+     (other . "gnu"))))
+ '(column-number-mode t)
+ '(custom-enabled-themes (quote (deeper-blue)))
+ '(fill-column 80)
+ '(ido-mode (quote both) nil (ido))
+ '(inhibit-startup-screen t)
+ '(mouse-yank-at-point t)
+ '(nxml-child-indent 4)
+ '(org-src-fontify-natively t)
+ '(python-shell-interpreter "python3")
+ '(scroll-conservatively 10000)
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(defun my-nxml-mode-hook ()
+  (setq tab-width 4 indent-tabs-mode nil))
+(add-hook 'nxml-mode-hook 'my-nxml-mode-hook)
+
+;; occur
+(global-set-key (kbd "C-c o") 'occur)
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; temporary mark
+;; C-. to make a temporary mark,
+;; C-, to move between the current point and the temporary mark.
+(global-set-key [(control ?\.)] 'ska-point-to-register)
+(global-set-key [(control ?\,)] 'ska-jump-to-register)
+(defun ska-point-to-register()
+  "Store cursorposition _fast_ in a register. 
+Use ska-jump-to-register to jump back to the stored 
+position."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (point-to-register 8))
+
+(defun ska-jump-to-register()
+  "Switches between current cursorposition and position
+that was stored with ska-point-to-register."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (let ((tmp (point-marker)))
+        (jump-to-register 8)
+        (set-register 8 tmp)))
+;;--------------------------------
+
+;;--------------------------------
+;; goto-char
+;; C-c a #a_char to goto a_char
+(defun wy-go-to-char (n char)
+  "Move forward to Nth occurence of CHAR.
+Typing `wy-go-to-char-key' again will move forwad to the next Nth
+occurence of CHAR."
+  (interactive "p\ncGo to char: ")
+  (search-forward (string char) nil nil n)
+  (while (char-equal (read-char)
+		          char)
+    (search-forward (string char) nil nil n))
+  (setq unread-command-events (list last-input-event)))
+
+(define-key global-map (kbd "C-c a") 'wy-go-to-char)
+;;--------------------------------
+
+;;--------------------------------
+;; easy copying
+(defun copy-line (&optional arg)
+  "Save current line into Kill-Ring without mark the line"
+  (interactive "P")
+  (let ((beg (line-beginning-position))
+	(end (line-end-position arg)))
+    (copy-region-as-kill beg end)))
+
+(defun copy-word (&optional arg)
+  "Copy words at point"
+  (interactive "P")
+  (let ((beg (progn (if (looking-back "[a-zA-Z0-9]" 1) (backward-word 1)) (point)))
+	(end (progn (forward-word arg) (point))))
+    (copy-region-as-kill beg end)))
+
+(defun copy-paragraph (&optional arg)
+  "Copy paragraphs at point"
+  (interactive "P")
+  (let ((beg (progn (backward-paragraph 1) (point)))
+	(end (progn (forward-paragraph arg) (point))))
+    (copy-region-as-kill beg end)))
+;;--------------------------------
+
+
+(setq frame-title-format "emacs@%f")
+
+;; customized key binding
+(global-set-key (kbd "<f9>") 'speedbar)
+(global-set-key (kbd "<f11>") 'calendar)
+(global-set-key (kbd "<f12>") 'list-bookmarks)
+(global-set-key (kbd "<C-f1>") 'tags-search)
+(global-set-key (kbd "<C-f2>") 'find-file-at-point)
+(global-set-key (kbd "<f5>") 'imenu)
+(global-set-key (kbd "<f7>") 'compile)
+(global-set-key (kbd "<f8>") 'toggle-truncate-lines)
+
+;; org-mode
+;-----------
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ce" 'org-agenda)
+
+;; windmove
+(windmove-default-keybindings)
+
+;; octave-mode
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))

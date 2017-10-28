@@ -1,0 +1,231 @@
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
+ '(c-default-style
+   (quote
+    ((c-mode . "stroustrup")
+     (c++-mode . "stroustrup")
+     (java-mode . "java")
+     (awk-mode . "awk")
+     (other . "gnu"))))
+ '(custom-enabled-themes (quote (deeper-blue)))
+ '(fill-column 79)
+ '(ido-mode (quote both) nil (ido))
+ '(inhibit-startup-screen t)
+ '(ispell-program-name "aspell" t)
+ '(mouse-yank-at-point t)
+ '(package-selected-packages (quote (slime paredit js2-mode impatient-mode)))
+ '(scroll-conservatively 10000)
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(set-fontset-font "fontset-default" 'gb18030' ("Microsoft YaHei" . "unicode-bmp"))
+
+;; ================================================================
+;; comment out current line
+(defun line-comment(&optional arg)
+  "Comments out or uncomment out current line."
+  (interactive "P")
+  (comment-region (+ (current-indentation) (line-beginning-position))
+		  (+ 1 (line-end-position))
+		  arg))
+
+(defun my-cpp-mode-hook()
+  (setq tab-width 4 indent-tabs-mode nil)
+  (which-function-mode 1)
+  (setq hippie-expand-try-functions-list
+	'(try-expand-dabbrev
+	  try-expand-dabbrev-visible
+	  try-expand-dabbrev-all-buffers
+	  try-expand-dabbrev-from-kill
+	  try-complete-file-name-partially
+	  try-complete-file-name
+	  try-expand-all-abbrevs
+	  try-expand-list
+	  try-expand-line)))
+(add-hook 'c-mode-hook 'my-cpp-mode-hook)
+(add-hook 'c++-mode-hook 'my-cpp-mode-hook)
+;(add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+(add-hook 'java-mode-hook 'my-cpp-mode-hook)
+
+;; server
+(server-start)
+
+;; To save the buffer opened, M-x desktop-save.
+;; To clear the saved records, M-x desktop-clear.
+(desktop-save-mode t)
+;; Customization follows below
+(setq history-length 250)
+(add-to-list 'desktop-globals-to-save 'file-name-history)
+
+;; occur
+(global-set-key (kbd "C-c o") 'occur)
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; hippie-expand to replace the default M-/(dabbrev-expand)
+(global-set-key [(meta ?/)] 'hippie-expand)
+
+;; temporary mark
+;; C-. to make a temporary mark,
+;; C-, to move between the current point and the temporary mark.
+(global-set-key [(control ?\.)] 'ska-point-to-register)
+(global-set-key [(control ?\,)] 'ska-jump-to-register)
+(defun ska-point-to-register()
+  "Store cursorposition _fast_ in a register. 
+Use ska-jump-to-register to jump back to the stored 
+position."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (point-to-register 8))
+
+(defun ska-jump-to-register()
+  "Switches between current cursorposition and position
+that was stored with ska-point-to-register."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (let ((tmp (point-marker)))
+        (jump-to-register 8)
+        (set-register 8 tmp)))
+;;--------------------------------
+
+;;--------------------------------
+;; goto-char
+;; C-c a #a_char to goto a_char
+;; (defun wy-go-to-char (n char)
+;;   "Move forward to Nth occurence of CHAR.
+;; Typing `wy-go-to-char-key' again will move forwad to the next Nth
+;; occurence of CHAR."
+;;   (interactive "p\ncGo to char: ")
+;;   (search-forward (string char) nil nil n)
+;;   (while (char-equal (read-char)
+;; 		     char)
+;;     (search-forward (string char) nil nil n))
+;;   (setq unread-command-events (list last-input-event)))
+
+;; (define-key global-map (kbd "C-c a") 'wy-go-to-char)
+;;--------------------------------
+
+;;--------------------------------
+;; easy copying
+
+(defun copy-line (&optional arg)
+  "Save current line into Kill-Ring without mark the line"
+  (interactive "P")
+  (let ((beg (line-beginning-position))
+	(end (line-end-position arg)))
+    (copy-region-as-kill beg end)))
+
+(defun copy-word (&optional arg)
+  "Copy words at point"
+  (interactive "P")
+  (let ((beg (progn (if (looking-back "[a-zA-Z0-9]" 1) (backward-word 1)) (point)))
+	(end (progn (forward-word arg) (point))))
+    (copy-region-as-kill beg end)))
+
+(defun copy-paragraph (&optional arg)
+  "Copy paragraphs at point"
+  (interactive "P")
+  (let ((beg (progn (backward-paragraph 1) (point)))
+	(end (progn (forward-paragraph arg) (point))))
+    (copy-region-as-kill beg end)))
+;;--------------------------------
+
+(setq frame-title-format "%f")
+(setq user-full-name "Ryan Duan")
+(setq user-mail-address "duanpanda@gmail.com")
+
+;; customized key binding
+(global-set-key (kbd "<f9>") 'speedbar)
+(global-set-key (kbd "<f11>") 'calendar)
+(global-set-key (kbd "<f12>") 'list-bookmarks)
+(global-set-key (kbd "<C-f1>") 'tags-search)
+(global-set-key (kbd "<C-f2>") 'find-file-at-point)
+(global-set-key (kbd "<f5>") 'imenu)
+(global-set-key (kbd "<f7>") 'compile)
+(global-set-key (kbd "<f6>") 'line-comment)
+(windmove-default-keybindings)
+
+;; org-mode
+;-----------
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ce" 'org-agenda)
+
+;;; SWI-Prolog
+;(autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
+;(autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
+;(autoload 'mercury-mode "prolog" "Major mode for editing Mercury programs." t)
+;(setq prolog-system 'swi)
+;(setq auto-mode-alist (append '(("\\.pl$" . prolog-mode)
+;                                ("\\.m$" . mercury-mode))
+;                               auto-mode-alist))
+
+;;; SLIME
+;(setq inferior-lisp-program "wx86cl64.exe") ; my lisp system
+;(setq inferior-lisp-program "sbcl.exe")
+;(setq slime-contribs '(slime-fancy))
+
+;;; Quicklisp SLIME helper
+;(load (expand-file-name "~/quicklisp/slime-helper.el"))
+
+;;;;;;;;;;;;;;;;;
+;; Paredit Mode
+;;;;;;;;;;;;;;;;;
+(autoload 'enable-paredit-mode "paredit"
+  "Turn on pseudo-structural editing of Lisp code."
+  t)
+(add-hook 'lisp-mode-hook 'enable-paredit-mode)
+(add-hook 'scheme-mode-hook 'enable-paredit-mode)
+
+;;;;;;;;;;;;
+;; Scheme 
+;;;;;;;;;;;;
+
+(setq scheme-program-name "racket")
+
+;;; web-mode
+;; (require 'web-mode)
+;; (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+;; (defun my-web-mode-hook ()
+;;   "Hooks for Web mode."
+;;   (setq web-mode-markup-indent-offset 2)
+;;   (setq web-mode-css-indent-offset 2)
+;;   (setq web-mode-code-indent-offset 2)
+;;   (setq web-mode-style-padding 1)
+;;   (setq web-mode-script-padding 1)
+;;   (setq web-mode-block-padding 0))
+;; (add-hook 'web-mode-hook 'my-web-mode-hook)
+;; (setq web-mode-extra-snippets
+;;       '((nil . (("jquery" . "<!doctype html>\n<html>\n<head>\n<title></title>\n<meta charset=\"utf-8\" />\n<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js\"></script>\n</head>\n<body>\n|\n</body>\n</html>")))))
+
+;;; js2-mode
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;;; MELPA
+(require 'package)
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.org/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
