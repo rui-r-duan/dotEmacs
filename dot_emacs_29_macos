@@ -1,0 +1,163 @@
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(css-indent-offset 2)
+ '(custom-enabled-themes '(adwaita))
+ '(eglot-extend-to-xref t)
+ '(epg-pinentry-mode 'loopback)
+ '(eshell-visual-commands
+   '("vi" "vim" "screen" "tmux" "top" "htop" "less" "more" "lynx" "links" "ncftp" "mutt" "pine" "tin" "trn" "elm" "cargo" "rustc" "git"))
+ '(inhibit-startup-screen t)
+ '(markdown-css-paths '("mkdown-css-file-name"))
+ '(ns-alternate-modifier 'super)
+ '(ns-command-modifier 'meta)
+ '(package-archives
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+     ("melpa" . "https://melpa.org/packages/")))
+ '(package-selected-packages
+   '(corfu coverlay origami elfeed vundo browse-kill-ring tide web-mode apheleia add-node-modules-path jtsx editorconfig mkdown graphql-mode graphql-ts-mode flymake-shellcheck groovy-mode gh-md typescript-mode go-mode rust-playground rust-mode company yaml-mode yasnippet js2-mode json-mode slime magit))
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Menlo" :foundry "nil" :slant normal :weight regular :height 160 :width normal)))))
+
+(use-package eglot
+  :config
+  (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c o") 'eglot-code-action-organize-imports)
+  (define-key eglot-mode-map (kbd "<f5>") 'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "<f7>") 'flymake-goto-next-error))
+;; (add-hook 'before-save-hook 'eglot-format-buffer))
+
+(use-package project
+  :config
+  (defun project-find-go-module (dir)
+    (when-let ((root (locate-dominating-file dir "go.mod")))
+      (cons 'go-module root)))
+  (cl-defmethod project-root ((project (head go-module)))
+    (cdr project))
+  (add-hook 'project-find-functions 'project-find-go-module)
+
+  (defun project-find-rust-proj (dir)
+    (when-let ((root (locate-dominating-file dir "Cargo.toml")))
+      (cons 'rust-proj root)))
+  (cl-defmethod project-root ((project (head rust-proj)))
+    (cdr project))
+  (add-hook 'project-find-functions 'project-find-rust-proj)
+
+  ;; (defun project-find-typescript-proj (dir)
+  ;;   (when-let ((root (locate-dominating-file dir "tsconfig.json")))
+  ;;     (cons 'typescript-proj root)))
+  ;; (cl-defmethod project-root ((project (head typescript-proj)))
+  ;;   (cdr project))
+  ;; (add-hook 'project-find-functions 'project-find-typescript-proj))
+
+  )
+
+(fido-vertical-mode 1)
+
+(use-package slime
+  :config
+  (setq slime-lisp-implementations '((sbcl ("sbcl"))))
+  (setq slime-default-lisp 'sbcl))
+
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+
+(setq frame-title-format "%f")
+
+(defun disable-indent-tabs-mode ()
+  (indent-tabs-mode -1))
+
+(add-hook 'groovy-mode-hook 'disable-indent-tabs-mode)
+(add-hook 'mhtml-mode-hook 'disable-indent-tabs-mode)
+(add-hook 'css-mode-hook 'disable-indent-tabs-mode)
+
+;; (use-package editorconfig
+;;   :ensure t
+;;   :config
+;;   (editorconfig-mode 1))
+
+(use-package jtsx
+  :ensure t
+  :mode (("\\.jsx?\\'" . jtsx-jsx-mode)
+         ("\\.tsx\\'" . jtsx-tsx-mode)
+         ("\\.ts\\'" . jtsx-typescript-mode))
+  :commands jtsx-install-treesit-language
+  :hook ((jtsx-jsx-mode . hs-minor-mode)
+         (jtsx-tsx-mode . hs-minor-mode)
+         (jtsx-typescript-mode . hs-minor-mode))
+  :custom
+  ;; Optional customizations
+  (js-indent-level 2)
+  (typescript-ts-mode-indent-offset 2)
+  (jtsx-switch-indent-offset 0)
+  (jtsx-indent-statement-block-regarding-standalone-parent nil)
+  (jtsx-jsx-element-move-allow-step-out t)
+  (jtsx-enable-jsx-electric-closing-element t)
+  (jtsx-enable-electric-open-newline-between-jsx-element-tags t)
+  (jtsx-enable-jsx-element-tags-auto-sync nil)
+  (jtsx-enable-all-syntax-highlighting-features t)
+  (column-number-mode t)
+  (tab-width 2)
+  :config
+  (defun jtsx-bind-keys-to-mode-map (mode-map)
+    "Bind keys to MODE-MAP."
+    (define-key mode-map (kbd "C-c C-j") 'jtsx-jump-jsx-element-tag-dwim)
+    (define-key mode-map (kbd "C-c j o") 'jtsx-jump-jsx-opening-tag)
+    (define-key mode-map (kbd "C-c j c") 'jtsx-jump-jsx-closing-tag)
+    (define-key mode-map (kbd "C-c j r") 'jtsx-rename-jsx-element)
+    (define-key mode-map (kbd "C-c <down>") 'jtsx-move-jsx-element-tag-forward)
+    (define-key mode-map (kbd "C-c <up>") 'jtsx-move-jsx-element-tag-backward)
+    (define-key mode-map (kbd "C-c C-<down>") 'jtsx-move-jsx-element-forward)
+    (define-key mode-map (kbd "C-c C-<up>") 'jtsx-move-jsx-element-backward)
+    (define-key mode-map (kbd "C-c C-S-<down>") 'jtsx-move-jsx-element-step-in-forward)
+    (define-key mode-map (kbd "C-c C-S-<up>") 'jtsx-move-jsx-element-step-in-backward)
+    (define-key mode-map (kbd "C-c j w") 'jtsx-wrap-in-jsx-element)
+    (define-key mode-map (kbd "C-c j u") 'jtsx-unwrap-jsx)
+    (define-key mode-map (kbd "C-c j d") 'jtsx-delete-jsx-node)
+    (define-key mode-map (kbd "C-c j t") 'jtsx-toggle-jsx-attributes-orientation)
+    (define-key mode-map (kbd "C-c j h") 'jtsx-rearrange-jsx-attributes-horizontally)
+    (define-key mode-map (kbd "C-c j v") 'jtsx-rearrange-jsx-attributes-vertically))
+  
+  (defun jtsx-bind-keys-to-jtsx-jsx-mode-map ()
+    (jtsx-bind-keys-to-mode-map jtsx-jsx-mode-map))
+
+  (defun jtsx-bind-keys-to-jtsx-tsx-mode-map ()
+    (jtsx-bind-keys-to-mode-map jtsx-tsx-mode-map))
+
+  (defun jtsx-disable-indent-tabs-mode ()
+    (indent-tabs-mode -1))
+
+  (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map)
+
+  (add-hook 'jtsx-jsx-mode-hook 'jtsx-disable-indent-tabs-mode)
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-disable-indent-tabs-mode)
+
+  (defun jtsx-require-css-in-js-mode ()
+    (require 'css-in-js-mode))
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-require-css-in-js-mode))
+
+;; (apheleia-global-mode +1)
+
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+
+
+(setq elfeed-feeds
+      '("https://ochagavia.nl/blog/index.xml"))
+
+(add-to-list 'load-path "/Users/rduan1/.emacs.d/ruilisp")
+;; (require 'tsx-mode)
+;; (require 'css-in-js-mode)
+;; (add-to-list 'auto-mode-alist '("\\.[jt]s[x]?\\'" . tsx-mode))
+
+;; (add-hook 'tsx-mode-hook 'disable-indent-tabs-mode)
