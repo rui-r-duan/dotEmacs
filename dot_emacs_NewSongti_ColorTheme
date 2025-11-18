@@ -1,0 +1,287 @@
+;; ================================================================
+(setq w32-charset-info-alist
+    (cons '("gbk" w32-charset-gb2312 . 936) w32-charset-info-alist))
+
+(setq default-frame-alist
+      (append
+       '((font . "fontset-gbk")) default-frame-alist))
+
+(create-fontset-from-fontset-spec
+ (concat
+  "-outline-Courier New-normal-r-normal-normal-16-*-*-*-c-*-fontset-gbk,"
+  "chinese-gb2312:-outline-新宋体-normal-r-normal-16-*-*-*-*-c-*-iso10646-1,"
+  "mule-unicode-0100-24ff:-*-新宋体-normal-r-normal-16-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-5:-*-新宋体-normal-r-normal-16-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-6:-*-新宋体-normal-r-normal-16-*-*-*-*-c-*-iso10646-1,"
+  "chinese-cns11643-7:-*-新宋体-normal-r-normal-16-*-*-*-*-c-*-iso10646-1"))
+
+(set-default-font "fontset-gbk")
+;; ================================================================
+
+;(transient-mark-mode t)
+(setq inhibit-startup-message t)
+(setq column-number-mode t)
+(setq mouse-yank-at-point t)
+(setq default-fill-column 80)
+(show-paren-mode t)
+(tool-bar-mode nil)
+
+;; server
+(server-start)
+
+;; color theme
+(require 'color-theme)
+(color-theme-initialize)
+(color-theme-ryan)
+
+;; To save the buffer opened, M-x desktop-save.
+;; To clear the saved records, M-x desktop-clear.
+(load "desktop")
+(desktop-load-default)
+(desktop-read)
+
+;; session.el
+;(require 'session)
+;(add-hook 'after-init-hook 'session-initialize)
+
+;; ibuffer.el
+;(require 'ibuffer)
+;(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; browse-kill-ring.el
+;(require 'browse-kill-ring)
+;(global-set-key [(control c)(k)] 'browse-kill-ring)
+;(browse-kill-ring-default-keybindings)
+
+;; tabbar.el
+;(require 'tabbar)
+;(tabbar-mode)
+;(global-set-key (kbd "") 'tabbar-backward-group)
+;(global-set-key (kbd "") 'tabbar-forward-group)
+;(global-set-key (kbd "") 'tabbar-backward)
+;(global-set-key (kbd "") 'tabbar-forward)
+
+;; tabbar hack
+;(setq tabbar-buffer-groups-function 'tabbar-buffer-ignore-groups)
+;(defun tabbar-buffer-ignore-groups (buffer)
+;  "Return the list of group names BUFFER belongs to.
+;Return only one group for each buffer."
+;  (with-current-buffer (get-buffer buffer)
+;    (cond
+;     ((or (get-buffer-process (current-buffer))
+;          (memq major-mode
+;                '(comint-mode compilation-mode)))
+;      '("Process")
+;      )
+;     ((member (buffer-name)
+;              '("*scratch*" "*Messages*"))
+;      '("Common")
+;      )
+;     ((eq major-mode 'dired-mode)
+;      '("Dired")
+;      )
+;     ((memq major-mode
+;            '(help-mode apropos-mode Info-mode Man-mode))
+;      '("Help")
+;      )
+;     ((memq major-mode
+;            '(rmail-mode
+;              rmail-edit-mode vm-summary-mode vm-mode mail-mode
+;              mh-letter-mode mh-show-mode mh-folder-mode
+;              gnus-summary-mode message-mode gnus-group-mode
+;              gnus-article-mode score-mode gnus-browse-killed-mode))
+;      '("Mail")
+;      )
+;     (t
+;      (list 
+;       "default"  ;; no-grouping
+;       (if (and (stringp mode-name) (string-match "[^ ]" mode-name))
+;           mode-name
+;         (symbol-name major-mode)))
+;      )     
+;     )))
+
+;; table.el
+;(autoload 'table-insert "table" "WYGIWYS table editor")
+
+;; rect-mark.el
+;; 如果你已经有了一个 region。你可以使用 C-x r C-x 把它显示为一个矩形。如果你刚开始设定一个矩形区域，你可以使用 C-x r 作为你的 set-mark-command 的前缀，比如 C-x r C-SPC。那么区域会被显示为矩形。
+
+;; hippie-expand to replace the default M-/(dabbrev-expand)
+;(global-set-key [(meta ?/)] 'hippie-expand)
+;(setq hippie-expand-try-functions-list 
+;      '(try-expand-dabbrev
+;	try-expand-dabbrev-visible
+;	try-expand-dabbrev-all-buffers
+;	try-expand-dabbrev-from-kill
+;	try-complete-file-name-partially
+;	try-complete-file-name
+;	try-expand-all-abbrevs
+;	try-expand-list
+;	try-expand-line
+;	try-complete-lisp-symbol-partially
+;	try-complete-lisp-symbol))
+;;--------------------------------
+;; temporary mark
+;; C-. to make a temporary mark,
+;; C-, to move between the current point and the temporary mark.
+(global-set-key [(control ?\.)] 'ska-point-to-register)
+(global-set-key [(control ?\,)] 'ska-jump-to-register)
+(defun ska-point-to-register()
+  "Store cursorposition _fast_ in a register. 
+Use ska-jump-to-register to jump back to the stored 
+position."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (point-to-register 8))
+
+(defun ska-jump-to-register()
+  "Switches between current cursorposition and position
+that was stored with ska-point-to-register."
+  (interactive)
+  (setq zmacs-region-stays t)
+  (let ((tmp (point-marker)))
+        (jump-to-register 8)
+        (set-register 8 tmp)))
+;;--------------------------------
+
+;;--------------------------------
+;; goto-char
+;; C-c a #a_char to goto a_char
+(defun wy-go-to-char (n char)
+  "Move forward to Nth occurence of CHAR.
+Typing `wy-go-to-char-key' again will move forwad to the next Nth
+occurence of CHAR."
+  (interactive "p\ncGo to char: ")
+  (search-forward (string char) nil nil n)
+  (while (char-equal (read-char)
+		     char)
+    (search-forward (string char) nil nil n))
+  (setq unread-command-events (list last-input-event)))
+
+(define-key global-map (kbd "C-c a") 'wy-go-to-char)
+;;--------------------------------
+
+;;hide region
+;(require 'hide-region)
+;(global-set-key (kbd "C-c r") 'hide-region-hide)
+;(global-set-key (kbd "C-c R") 'hide-region-unhide)
+
+;; hide lines
+;(require 'hide-lines)
+;(global-set-key (kbd "C-c l") 'hide-lines)
+;(global-set-key (kbd "C-c L") 'show-all-invisible)
+
+;;--------------------------------
+;; folding
+;;--------------------------------
+;(load-library  "folding")
+;(declare (special fold-fold-on-startup
+;		  fold-keys-already-setup
+;		  ))
+    
+;(setq fold-fold-on-startup t)
+;(folding-mode-add-find-file-hook)
+
+;(setq fold-keys-already-setup nil)
+;(add-hook 'folding-mode-hook
+;	  (function (lambda()
+;		      (unless fold-keys-already-setup
+;			(setq fold-keys-already-setup t)
+;			(define-prefix-command 'ctl-f-folding-mode-prefix)
+;			(define-key 'ctl-f-folding-mode-prefix "f" 'fold-fold-region)
+;			(define-key  'ctl-f-folding-mode-prefix "e" 'fold-enter)
+;			(define-key 'ctl-f-folding-mode-prefix "x" 'fold-exit)
+;			(define-key  'ctl-f-folding-mode-prefix "b" 'fold-whole-buffer)
+;			(define-key 'ctl-f-folding-mode-prefix "o" 'fold-open-buffer)
+;			(define-key 'ctl-f-folding-mode-prefix "h" 'fold-hide)
+;			(define-key 'ctl-f-folding-mode-prefix "s" 'fold-show)
+;			(define-key 'ctl-f-folding-mode-prefix "t" 'fold-top-level)
+;			(define-key 'ctl-f-folding-mode-prefix "f" 'fold-fold-region)
+;			)
+;		      (local-set-key "\C-f" 'ctl-f-folding-mode-prefix))))
+
+;(fold-add-to-marks-list 'sgml-mode
+;			"<!-- {" 
+; 			"<!-- } -->" " --> ")
+;(fold-add-to-marks-list 'c-mode "/* <" "/* > */" "*/")
+;(fold-add-to-marks-list 'c++-mode
+;			"//<" "//>" "")
+;(fold-add-to-marks-list 'LaTeX-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'latex2e-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'latex-mode "%%%% {{{" "%%%% }}}" " ")
+;(fold-add-to-marks-list 'BibTeX-mode "%%% {{{" "%%% }}}" " ")
+;(fold-add-to-marks-list 'lisp-mode ";;; {" ";;; }" "")
+;(fold-add-to-marks-list 'lex-mode" /* {{{ " " /* }}} */ " "*/")
+;(fold-add-to-marks-list 'html-mode "<!-- { " "<!-- } -->" "-->")
+;(fold-add-to-marks-list 'shell-script-mode "# {{{" "# }}}" nil)
+;(fold-add-to-marks-list 'sh-mode "# {{{ " "# }}}" nil)
+;;-END FOLDING--------------------------------
+
+;;--------------------------------
+;; dictionary
+;;--------------------------------
+;(load "dictionary-init")
+
+;; key bindings
+;(global-set-key "\C-cs" 'dictionary-search)
+;(global-set-key "\C-cm" 'dictionary-match-words)
+;(global-set-key [(control c)(d)] 'dictionary-lookup-definition)
+
+;; choose a dictionary server
+;(setq dictionary-server "localhost")
+
+;; for dictionary tooltip mode
+;; choose the dictionary: "wn" for WordNet
+;; "web1913" for Webster's Revised Unabridged Dictionary(1913)
+;; so on
+;(setq dictionary-tooltip-dictionary "wn")
+;; global dictionary-mode
+;(global-dictionary-tooltip-mode t)
+;; activate for all text-based modes
+;(add-hook 'text-mode-hook 'dictionary-tooltip-mode)
+;(dictionary-tooltip-mode t)
+
+;;--------------------------------
+
+(setq frame-title-format "emacs@%b")
+(setq user-full-name "Ryan Duan")
+(setq user-mail-address "duanpanda@hotmail.com")
+
+;; customized key binding
+(global-set-key (kbd "<f11>") 'calendar)
+;(global-set-key (kbd "<f12>") 'list-bookmarks)
+
+;; time of sun-rise and sun-set. Type S key in calendar to see it.
+(setq calendar-latitude +39.54)
+(setq calendar-longitude +116.28)
+(setq calendar-location-name "北京")
+
+;; 设置阴历显示。在calendar上用pC显示阴历
+(setq chinese-calendar-celestial-stem
+  ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+(setq chinese-calendar-terrestrial-branch
+  ["子" "丑" "寅" "卯" "辰" "巳" "戊" "未" "申" "酉" "戌" "亥"])
+
+;; 设置 calendar 的显示
+(setq calendar-remove-frame-by-deleting t)
+(setq calendar-week-start-day 1)            ; 设置星期一为每周的第一天
+(setq mark-diary-entries-in-calendar t)     ; 标记calendar上有diary的日期
+(setq mark-holidays-in-calendar nil)        ; 为了突出有diary的日期，calendar上不标记节日
+(setq view-calendar-holidays-initially nil) ; 打开calendar的时候不显示一堆节日 
+
+;; 去掉不关心的节日，设定自己在意的节日，在 calendar 上用 h 显示节日
+(setq christian-holidays nil)
+(setq hebrew-holidays nil)
+(setq islamic-holidays nil)
+(setq solar-holidays nil)
+(setq general-holidays '((holiday-fixed 2 14 "情人节")
+                         (holiday-float 5 0 2 "母亲节")
+                         (holiday-fixed 6 1 "儿童节")
+                         (holiday-float 6 0 3 "父亲节")
+                         (holiday-fixed 7 1 "建党节")
+                         (holiday-fixed 8 1 "建军节")
+                         (holiday-fixed 9 10 "教师节")
+                         (holiday-fixed 10 1 "国庆节")
+                         (holiday-fixed 12 25 "圣诞节")))
+

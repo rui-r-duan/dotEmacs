@@ -1,0 +1,62 @@
+;; color scheme
+(setq default-frame-alist
+ '(
+   (foreground-color . "Wheat")
+   (background-color . "DarkSlateGray")
+   (cursor-color     . "Orchid")
+   ))
+
+(put 'set-goal-column 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(global-set-key [?\C-z] 'undo)
+(global-set-key (kbd "C-c  g") 'goto-line)
+
+(setq transient-mark-mode t)
+
+(auto-image-file-mode t)
+
+(defun w32-restore-frame ()
+    "Restore a minimized frame"
+     (interactive)
+     (w32-send-sys-command 61728))
+(defun w32-maximize-frame ()
+    "Maximize the current frame"
+     (interactive)
+     (w32-send-sys-command 61488))
+;;; Maximum Windows Frame
+(w32-maximize-frame)
+
+(global-font-lock-mode t)
+(set-language-environment 'Chinese-GB)
+(set-keyboard-coding-system 'euc-cn)
+(set-clipboard-coding-system 'euc-cn)
+(set-terminal-coding-system 'euc-cn)
+(set-buffer-file-coding-system 'euc-cn)
+(set-selection-coding-system 'euc-cn)
+(modify-coding-system-alist 'process "*" 'euc-cn)
+(setq default-process-coding-system 
+            '(euc-cn . euc-cn))
+(setq-default pathname-coding-system 'euc-cn)
+;; (set-default-font "-outline-\320\302\313\316\314\345-normal-r-normal-normal-13-97-96-96-c-70-ios10646-1")
+(set-default-font "-outline-\320\302\313\316\314\345-normal-r-normal-normal-16-120-96-96-c-*-gb2312")
+(setq inhibit-startup-message t)
+(setq column-number-mode t)
+(setq mouse-yank-at-point t)
+;; (setq sentence-end "\\([¡££¡£¿]\\|¡­¡­\\|[.!?][]\"')]*\\($\\|[ \t]\\)\\)[ \t\n]*")
+;; (setq sentence-end-double-space nil)
+
+(setq default-major-mode 'text-mode)
+(setq default-fill-column 79)
+
+(show-paren-mode t)
+(setq show-paren-style 'parentheses)
+
+(mouse-avoidance-mode 'animate)
+
+(setq frame-title-format "emacs@%b")
+
+(setq user-full-name "Ryan Duan")
+(setq user-mail-address "duanpanda@hotmail.com")

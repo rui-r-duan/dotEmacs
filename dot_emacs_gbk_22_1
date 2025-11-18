@@ -1,0 +1,97 @@
+;; Where to find mule-gbk
+;(add-to-list 'load-path "C:/Program Files/emacs-22.1/site-lisp")
+
+;; Load mule-gbk
+;(require 'mule-gbk)
+
+;; Setup GBK environment
+;(set-terminal-coding-system 'chinese-gbk)
+;(set-keyboard-coding-system 'chinese-gbk)
+;(set-language-environment 'chinese-gbk)
+;(setq locale-coding-system 'chinese-gbk)
+;(setq current-language-environment "Chinese-GBK")
+
+;(setq w32-charset-info-alist
+;    (cons '("gbk" w32-charset-gb2312 . 936) w32-charset-info-alist))
+
+;; Load modified utf-translate-cjk-mode
+;;(require 'gbk-utf-mode)
+;; Turn on utf-translate-cjk-mode
+;;(utf-translate-cjk-mode 1)
+
+;; color scheme
+(setq default-frame-alist
+  '((foreground-color . "Wheat")
+    (background-color . "DarkSlateGray")
+    (cursor-color . "Orchid")))
+
+(transient-mark-mode t)
+(setq inhibit-startup-message t)
+(setq column-number-mode t)
+(setq mouse-yank-at-point t)
+(setq default-fill-column 79)
+
+(show-paren-mode t)
+
+(tool-bar-mode 0)
+
+;(mouse-avoidance-mode 'animate)
+
+(server-start)
+;(add-hook 'kill-emacs-hook
+;       (lambda()
+;               (if (file-exists-p "c:/.emacs.d/server/server")
+;                  (delete-file "c:/.emacs.d/server/server"))))
+
+(setq frame-title-format "emacs@%b")
+
+(setq user-full-name "Ryan Duan")
+(setq user-mail-address "duanpanda@hotmail.com")
+
+;; customized key binding
+(global-set-key [?\C-z] 'undo)
+(global-set-key (kbd "<f11>") 'calendar)
+(global-set-key (kbd "<f12>") 'list-bookmarks)
+
+;; todo mode
+(setq todo-file-do "d:/workfiles/do")
+(setq todo-file-done "d:/workfiles/done")
+(setq todo-file-top "d:/workfiles/top")
+(setq appt-issue-message t)
+
+;; time of sun-rise and sun-set. Type S key in calendar to see it.
+(setq calendar-latitude +39.54)
+(setq calendar-longitude +116.28)
+(setq calendar-location-name "北京")
+
+;; 设置阴历显示。在calendar上用pC显示阴历
+(setq chinese-calendar-celestial-stem
+  ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+(setq chinese-calendar-terrestrial-branch
+  ["子" "丑" "寅" "卯" "辰" "巳" "戊" "未" "申" "酉" "戌" "亥"])
+
+;; 设置 calendar 的显示
+(setq calendar-remove-frame-by-deleting t)
+(setq calendar-week-start-day 1)            ; 设置星期一为每周的第一天
+(setq mark-diary-entries-in-calendar t)     ; 标记calendar上有diary的日期
+(setq mark-holidays-in-calendar nil)        ; 为了突出有diary的日期，calendar上不标记节日
+(setq view-calendar-holidays-initially nil) ; 打开calendar的时候不显示一堆节日 
+
+;; 去掉不关心的节日，设定自己在意的节日，在 calendar 上用 h 显示节日
+(setq christian-holidays nil)
+(setq hebrew-holidays nil)
+(setq islamic-holidays nil)
+(setq solar-holidays nil)
+(setq general-holidays '((holiday-fixed 2 14 "情人节")
+                         (holiday-float 5 0 2 "母亲节")
+                         (holiday-fixed 6 1 "儿童节")
+                         (holiday-float 6 0 3 "父亲节")
+                         (holiday-fixed 7 1 "建党节")
+                         (holiday-fixed 8 1 "建军节")
+                         (holiday-fixed 9 10 "教师节")
+                         (holiday-fixed 10 1 "国庆节")
+                         (holiday-fixed 12 25 "圣诞节")))
+
+(setq diary-file "d:/workfiles/diary/diary")
+(add-hook 'diary-hook 'appt-make-list)
+
